@@ -1,40 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The New York Times Clone</title>
+    <link rel="icon" type="image/png" href="https://img.icons8.com/ios-filled/50/new-york-times--v1.png">
+
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    
+
+
+
     <style>
         /* Custom styles to mimic NYT */
         body {
             font-family: "nyt-cheltenham", georgia, "times new roman", times, serif;
         }
+
         .nyt-logo {
             font-family: "nyt-cheltenham", georgia, "times new roman", times, serif;
             font-weight: 700;
             font-style: italic;
         }
+
         .article-title {
             font-family: "nyt-cheltenham", georgia, "times new roman", times, serif;
             font-weight: 700;
         }
+
         .article-summary {
             font-family: "nyt-imperial", georgia, "times new roman", times, serif;
         }
+
         .article-byline {
             font-family: "nyt-franklin", arial, helvetica, sans-serif;
             font-size: 0.875rem;
         }
+
         .nav-sections a:hover {
             background-color: #f7f7f7;
         }
+
         .section-divider {
             border-top: 1px solid #e2e2e2;
         }
+
         /* For the paywall effect */
         .fade-overlay {
             display: none;
@@ -46,6 +58,7 @@
             background: linear-gradient(transparent, white);
             z-index: 10;
         }
+
         .paywall {
             display: none;
             position: absolute;
@@ -57,148 +70,271 @@
             z-index: 20;
             padding: 1rem;
             text-align: center;
-            box-shadow: 0 -5px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.1);
         }
 
         img.object-contain {
-        filter: brightness(0); /* Makes the logo black */
-    }
+            filter: brightness(0);
+            /* Makes the logo black */
+        }
 
-    .group {
-        position: relative;
-    }
+        .group {
+            position: relative;
+        }
 
-    .group:hover .group-hover\:block {
-        display: block;
-    }
-    
-    .nav-sections .group:hover > a {
-        background-color: #f7f7f7;
-    }
+        .group:hover .group-hover\:block {
+            display: block;
+        }
 
-    .nav-sections .absolute {
-        left: 0;
-        min-width: 200px;
-        background-color: white;
-        border: 1px solid #e2e2e2;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
+        .nav-sections .group:hover>a {
+            background-color: #f7f7f7;
+        }
 
-    /* Smooth transition for dropdown */
-    .nav-sections .absolute {
-        transition: opacity 0.2s ease-in-out;
-        opacity: 0;
-        pointer-events: none;
-    }
+        .nav-sections .absolute {
+            left: 0;
+            min-width: 200px;
+            background-color: white;
+            border: 1px solid #e2e2e2;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-    .nav-sections .group:hover .absolute {
-        opacity: 1;
-        pointer-events: auto;
-    }
+        /* Smooth transition for dropdown */
+        .nav-sections .absolute {
+            transition: opacity 0.2s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+        }
 
+        .nav-sections .group:hover .absolute {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .search-container {
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .search-container.hidden {
+            display: none;
+            opacity: 0;
+        }
+
+        .search-container.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        #voiceSearchBtn.listening {
+            color: #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Add these styles to your existing style section */
+        /* Add these styles to your existing style section */
+        .dropdown {
+            position: relative;
+            /* Ensure relative positioning */
+            display: inline-block;
+            z-index: 1000;
+            /* Adjusted z-index for dropdown */
+        }
+
+        .dropdown-button {
+            background-color: white;
+            color: black;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            top: 100%;
+            left: 0;
+            /* Increase z-index */
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* Add these new styles to handle dropdown visibility */
+        .dropdown-content.show {
+            display: block;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        .show {
+            display: block;
+        }
     </style>
 </head>
+
 <body class="bg-white">
     <!-- Top Navigation -->
     <div class="border-b border-gray-200">
         <div class="container mx-auto px-4 py-2">
-            
-                <div class="flex justify-center mb-2">
-                    <ul class="flex space-x-4 text-sm">
-                        <li><a href="/" class="hover:underline font-bold" aria-current="page">U.S.</a></li>
-                        <li><a href="/international/" class="hover:underline text-gray-600">International</a></li>
-                        <li><a href="/ca/" class="hover:underline text-gray-600">Canada</a></li>
-                        <li><a href="https://www.nytimes.com/es/" class="hover:underline text-gray-600">Español</a></li>
-                        <li><a href="https://cn.nytimes.com" class="hover:underline text-gray-600">中文</a></li>
-                    </ul>
-                </div>
-                <div class="flex justify-between items-center">
-                    <div class="flex space-x-4 items-center">
-                        <button class="p-2">
-                            <i class="fas fa-bars"></i>
-                        </button>
-                        <button class="p-2">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                    <div class="container mx-auto px-4">
-                        <!-- Replace SVG logo with image -->
-                        <div data-testid="masthead-desktop-logo" class="text-center mb-6">
-                            <a href="/" aria-label="New York Times homepage">
-                                <img src="https://www.vectorlogo.zone/logos/nytimes/nytimes-wordmark.svg" 
-                                     alt="The New York Times" 
-                                     class="w-48 mx-auto h-8 object-contain">
-                            </a>
+
+            <div class="flex justify-center mb-2">
+                <ul class="flex space-x-4 text-sm">
+                    <li><a href="/" class="hover:underline font-bold" aria-current="page">U.S.</a></li>
+                    <li><a href="/international/" class="hover:underline text-gray-600">International</a></li>
+                    <li><a href="/ca/" class="hover:underline text-gray-600">Canada</a></li>
+                    <li><a href="https://www.nytimes.com/es/" class="hover:underline text-gray-600">Español</a></li>
+                    <li><a href="https://cn.nytimes.com" class="hover:underline text-gray-600">中文</a></li>
+                </ul>
+            </div>
+            <div class="flex justify-between items-center">
+                <div class="flex space-x-4 items-center">
+                    <button class="p-2">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="p-2">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <!-- Add this after the search icon button -->
+                    <div class="search-container hidden absolute top-full left-0 w-full bg-white shadow-lg p-4"
+                        id="searchContainer">
+                        <div class="relative max-w-2xl mx-auto">
+                            <input type="text" id="searchInput"
+                                class="w-full px-4 py-2 pr-12 border border-gray-300 rounded-sm"
+                                placeholder="Search articles...">
+                            <button id="voiceSearchBtn"
+                                class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                        <div id="searchStatus" class="text-sm text-gray-500 mt-2 text-center hidden">
+                            Listening...
                         </div>
                     </div>
-                    <div class="flex space-x-4 items-center">
-                        <button class="hidden md:block bg-blue-700 hover:bg-blue-800 text-white py-1 px-3 rounded-sm text-sm">
-                            SUBSCRIBE
-                        </button>
-                        <button class="hidden md:block py-1 px-3 border border-gray-300 rounded-sm text-sm">
-                            LOG IN
-                        </button>
-                        <button class="md:hidden p-2">
-                            <i class="far fa-user"></i>
-                        </button>
+                </div>
+                <div class="container mx-auto px-4">
+                    <!-- Replace SVG logo with image -->
+                    <div data-testid="masthead-desktop-logo" class="text-center mb-6">
+                        <a href="/" aria-label="New York Times homepage">
+                            <img src="https://www.vectorlogo.zone/logos/nytimes/nytimes-wordmark.svg"
+                                alt="The New York Times" class="w-48 mx-auto h-8 object-contain">
+                        </a>
                     </div>
+                </div>
+                <div class="flex space-x-4 items-center">
+                    <button
+                        class="hidden md:block bg-blue-700 hover:bg-blue-800 text-white py-1 px-3 rounded-sm text-sm">
+                        SUBSCRIBE
+                    </button>
+                    <button class="hidden md:block py-1 px-3 border border-gray-300 rounded-sm text-sm">
+                        LOG IN
+                    </button>
+                    <button class="md:hidden p-2">
+                        <i class="far fa-user"></i>
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- Navigation Sections -->
-<div class="nav-sections border-b border-gray-200 py-2 overflow-x-auto">
-    <div class="container mx-auto px-4 flex space-x-4 whitespace-nowrap">
-        <!-- U.S. Section -->
-        <div class="group relative">
-            <a href="#" class="px-2 py-1 text-sm hover:bg-gray-100 inline-flex items-center">
-                U.S. 
-                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </a>
-            <div class="absolute hidden group-hover:block bg-white border border-gray-200 mt-1 py-2 w-48 z-50 shadow-lg">
-                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Politics</a>
-                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Education</a>
-                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">California</a>
-                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">New York</a>
-            </div>
-        </div>
+    <!-- Navigation Sections -->
+    <div class="nav-sections border-b border-gray-200 py-2 overflow-x-auto">
+        <div class="container mx-auto px-4 flex space-x-4 whitespace-nowrap">
 
-        <!-- Business Section -->
-        <div class="group relative">
-            <a href="#" class="px-2 py-1 text-sm hover:bg-gray-100 inline-flex items-center">
-                Business
-                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </a>
-            <div class="absolute hidden group-hover:block bg-white border border-gray-200 mt-1 py-2 w-48 z-50 shadow-lg">
-                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Economy</a>
-                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Tech</a>
-                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Media</a>
-                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Markets</a>
+            <!-- U.S. Section -->
+            <div class="dropdown">
+                <button class="dropdown-button">
+                    U.S.
+                    <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24">
+                        <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                    </svg>
+                </button>
+                <ul class="dropdown-content">
+                    <li><a href="#">Politics</a></li>
+                    <li><a href="#">Education</a></li>
+                    <li><a href="#">California</a></li>
+                    <li><a href="#">New York</a></li>
+                </ul>
             </div>
-        </div>
 
-        <!-- Politics Section -->
-        <div class="group relative">
-            <a href="#" class="px-2 py-1 text-sm hover:bg-gray-100 inline-flex items-center">
-                Politics
-                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </a>
-            <div class="absolute hidden group-hover:block bg-white border border-gray-200 mt-1 py-2 w-48 z-50 shadow-lg">
-                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Elections</a>
-                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Congress</a>
-                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Supreme Court</a>
-                <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">White House</a>
+            <!-- Business Section -->
+            <div class="dropdown">
+                <button class="dropdown-button">
+                    Business
+                    <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24">
+                        <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                    </svg>
+                </button>
+                <ul class="dropdown-content">
+                    <li><a href="#">Economy</a></li>
+                    <li><a href="#">Tech</a></li>
+                    <li><a href="#">Media</a></li>
+                    <li><a href="#">Markets</a></li>
+                </ul>
             </div>
+
+            <!-- Politics Section -->
+            <div class="dropdown">
+                <button class="dropdown-button">
+                    Politics
+                    <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24">
+                        <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                    </svg>
+                </button>
+                <ul class="dropdown-content">
+                    <li><a href="#">Elections</a></li>
+                    <li><a href="#">Congress</a></li>
+                    <li><a href="#">Supreme Court</a></li>
+                    <li><a href="#">White House</a></li>
+                </ul>
+            </div>
+
         </div>
     </div>
-</div>
 
     <!-- Date and current section -->
     <div class="container mx-auto px-4 py-2 text-xs text-gray-500">
@@ -216,17 +352,30 @@
                 <!-- Lead Story Column -->
                 <div class="md:col-span-2">
                     <article class="mb-8">
-                        <h1 class="article-title text-2xl md:text-4xl font-bold mb-3">Global Climate Summit Reaches Historic Carbon Agreement</h1>
-                        <p class="article-summary text-lg mb-3">Nations pledge to reduce emissions by 50% before 2035 in unprecedented unified climate action plan.</p>
+                        <h1 class="article-title text-2xl md:text-4xl font-bold mb-3">Global Climate Summit Reaches
+                            Historic Carbon Agreement</h1>
+                        <p class="article-summary text-lg mb-3">Nations pledge to reduce emissions by 50% before 2035 in
+                            unprecedented unified climate action plan.</p>
                         <div class="mb-4">
-                            <img src="https://media.istockphoto.com/id/157564891/photo/american-flag.jpg?s=612x612&w=0&k=20&c=kctfMaAULnvLw-SyTeAtnFXXFToFCE8bVTlZw7qG0Rg=" alt="Climate Summit" class="w-full h-auto">
-                            <p class="text-xs text-gray-500 mt-1">World leaders at the Climate Summit in Geneva reached a groundbreaking agreement. Credit: NYT/Placeholder</p>
+                            <img src="https://media.istockphoto.com/id/157564891/photo/american-flag.jpg?s=612x612&w=0&k=20&c=kctfMaAULnvLw-SyTeAtnFXXFToFCE8bVTlZw7qG0Rg="
+                                alt="Climate Summit" class="w-full h-auto">
+                            <p class="text-xs text-gray-500 mt-1">World leaders at the Climate Summit in Geneva reached
+                                a groundbreaking agreement. Credit: NYT/Placeholder</p>
                         </div>
-                        <p class="article-byline text-gray-500 mb-4">By MICHAEL ANDERSON and SARAH JENKINS | 7 MIN READ</p>
+                        <p class="article-byline text-gray-500 mb-4">By MICHAEL ANDERSON and SARAH JENKINS | 7 MIN READ
+                        </p>
                         <div class="article-content">
-                            <p class="mb-4">GENEVA — After two weeks of intense negotiations, representatives from 194 countries agreed to the most ambitious global climate pact in history early Saturday morning, committing wealthy nations to more than triple climate financing for developing countries while setting strict new emissions targets.</p>
-                            <p class="mb-4">The agreement, which has been hailed as a potential turning point in the climate crisis, introduces legally binding commitments that would keep global warming below the critical 1.5-degree Celsius threshold that scientists have warned would trigger catastrophic and irreversible climate events.</p>
-                            <p class="mb-4">"This is the moment future generations will look back on," said Amara Njoku, the summit chair from Nigeria. "The moment when nations finally chose a sustainable path forward together."</p>
+                            <p class="mb-4">GENEVA — After two weeks of intense negotiations, representatives from 194
+                                countries agreed to the most ambitious global climate pact in history early Saturday
+                                morning, committing wealthy nations to more than triple climate financing for developing
+                                countries while setting strict new emissions targets.</p>
+                            <p class="mb-4">The agreement, which has been hailed as a potential turning point in the
+                                climate crisis, introduces legally binding commitments that would keep global warming
+                                below the critical 1.5-degree Celsius threshold that scientists have warned would
+                                trigger catastrophic and irreversible climate events.</p>
+                            <p class="mb-4">"This is the moment future generations will look back on," said Amara Njoku,
+                                the summit chair from Nigeria. "The moment when nations finally chose a sustainable path
+                                forward together."</p>
                         </div>
                     </article>
 
@@ -235,19 +384,25 @@
                     <!-- Secondary Articles -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <article>
-                            <h2 class="article-title text-xl font-bold mb-2">Tech Giants Face New Antitrust Regulations</h2>
+                            <h2 class="article-title text-xl font-bold mb-2">Tech Giants Face New Antitrust Regulations
+                            </h2>
                             <div class="mb-3">
-                                <img src="data:image/jpeg;base64,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" alt="Tech Antitrust" class="w-full h-auto">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZsyBCj9ecyjbRgLG6kFjuNiZFk8vSO6Cvww&s"
+                                    alt="Tech Antitrust" class="w-full h-auto">
                             </div>
-                            <p class="article-summary mb-2">Landmark legislation aims to curb market dominance of major technology companies.</p>
+                            <p class="article-summary mb-2">Landmark legislation aims to curb market dominance of major
+                                technology companies.</p>
                             <p class="article-byline text-gray-500">By JESSICA MEYER</p>
                         </article>
                         <article>
-                            <h2 class="article-title text-xl font-bold mb-2">Supply Chain Innovations Reduce Global Food Waste</h2>
+                            <h2 class="article-title text-xl font-bold mb-2">Supply Chain Innovations Reduce Global Food
+                                Waste</h2>
                             <div class="mb-3">
-                                <img src="https://www.en.krishakjagat.org/wp-content/uploads/2022/09/maize2-1-768x427.jpg" alt="Food Supply Chain" class="w-full h-auto">
+                                <img src="https://www.en.krishakjagat.org/wp-content/uploads/2022/09/maize2-1-768x427.jpg"
+                                    alt="Food Supply Chain" class="w-full h-auto">
                             </div>
-                            <p class="article-summary mb-2">New technologies help farmers and distributors extend shelf life and improve distribution efficiency.</p>
+                            <p class="article-summary mb-2">New technologies help farmers and distributors extend shelf
+                                life and improve distribution efficiency.</p>
                             <p class="article-byline text-gray-500">By ROBERT CHEN</p>
                         </article>
                     </div>
@@ -260,21 +415,24 @@
                         <h3 class="text-lg font-bold border-b border-black pb-2 mb-4">Opinion</h3>
                         <div class="space-y-4">
                             <div class="flex">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1fRU2e_drQrosgHA2EYKgWYWBXir4nyf6_w&s" alt="Opinion Writer" class="w-12 h-12 rounded-full mr-3">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1fRU2e_drQrosgHA2EYKgWYWBXir4nyf6_w&s"
+                                    alt="Opinion Writer" class="w-12 h-12 rounded-full mr-3">
                                 <div>
                                     <h4 class="font-bold">Paul Krugman</h4>
                                     <p class="text-base">The Economic Implications of Our Climate Commitments</p>
                                 </div>
                             </div>
                             <div class="flex">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2jbBwvTAv4uCziy5xTllo_h-6uYF8yRcjQQ&s" alt="Opinion Writer" class="w-12 h-12 rounded-full mr-3">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2jbBwvTAv4uCziy5xTllo_h-6uYF8yRcjQQ&s"
+                                    alt="Opinion Writer" class="w-12 h-12 rounded-full mr-3">
                                 <div>
                                     <h4 class="font-bold">Michelle Goldberg</h4>
                                     <p class="text-base">Democracy's New Digital Frontiers</p>
                                 </div>
                             </div>
                             <div class="flex">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaMqjb168l835dk-tUkGJbRhSKjO-FIKfnxA&s" alt="Opinion Writer" class="w-12 h-12 rounded-full mr-3">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaMqjb168l835dk-tUkGJbRhSKjO-FIKfnxA&s"
+                                    alt="Opinion Writer" class="w-12 h-12 rounded-full mr-3">
                                 <div>
                                     <h4 class="font-bold">Ezra Klein</h4>
                                     <p class="text-base">Rethinking Our Approach to Public Health</p>
@@ -289,7 +447,8 @@
                         <ol class="list-decimal list-inside space-y-4 pl-2">
                             <li class="text-base">The Rise and Fall of Silicon Valley's Most Controversial Startup</li>
                             <li class="text-base">36 Hours in Barcelona: Where to Eat, Drink and Explore</li>
-                            <li class="text-base">Why Scientists Are Reconsidering Everything They Thought About Diet</li>
+                            <li class="text-base">Why Scientists Are Reconsidering Everything They Thought About Diet
+                            </li>
                             <li class="text-base">Review: In 'Tempest,' Shakespeare Gets a Modern Reimagining</li>
                             <li class="text-base">How to Master the Art of Productive Procrastination</li>
                         </ol>
@@ -311,26 +470,35 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <article>
                         <div class="mb-3">
-                            <img src="https://s.abcnews.com/images/US/hanna-swimmer-mo_hpMain_20200725-163152_2_4x3t_384.jpg" alt="Education Reforms" class="w-full h-auto">
+                            <img src="https://s.abcnews.com/images/US/hanna-swimmer-mo_hpMain_20200725-163152_2_4x3t_384.jpg"
+                                alt="Education Reforms" class="w-full h-auto">
                         </div>
-                        <h2 class="article-title text-xl font-bold mb-2">Educational Reforms Center on Critical Thinking</h2>
-                        <p class="article-summary mb-2">New curriculum guidelines emphasize problem-solving over memorization.</p>
+                        <h2 class="article-title text-xl font-bold mb-2">Educational Reforms Center on Critical Thinking
+                        </h2>
+                        <p class="article-summary mb-2">New curriculum guidelines emphasize problem-solving over
+                            memorization.</p>
                         <p class="article-byline text-gray-500">By DAVID WASHINGTON</p>
                     </article>
                     <article>
                         <div class="mb-3">
-                            <img src="data:image/jpeg;base64,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" alt="Healthcare Innovation" class="w-full h-auto">
+                            <img src="https://healthcarentsickcare.com/cdn/shop/articles/2d3fa6894828df6aa0a0a0282a011e65.png?v=1736166825"
+                                alt="Healthcare Innovation" class="w-full h-auto">
                         </div>
-                        <h2 class="article-title text-xl font-bold mb-2">Healthcare Innovation Reduces Hospital Wait Times</h2>
-                        <p class="article-summary mb-2">AI-powered systems help prioritize patients and allocate resources efficiently.</p>
+                        <h2 class="article-title text-xl font-bold mb-2">Healthcare Innovation Reduces Hospital Wait
+                            Times</h2>
+                        <p class="article-summary mb-2">AI-powered systems help prioritize patients and allocate
+                            resources efficiently.</p>
                         <p class="article-byline text-gray-500">By MARIA LOPEZ</p>
                     </article>
                     <article>
                         <div class="mb-3">
-                            <img src="https://imagez.tmz.com/image/fa/4by3/2020/08/04/fad55ee236fc4033ba324e941bb8c8b7_md.jpg" alt="Urban Planning" class="w-full h-auto">
+                            <img src="https://imagez.tmz.com/image/fa/4by3/2020/08/04/fad55ee236fc4033ba324e941bb8c8b7_md.jpg"
+                                alt="Urban Planning" class="w-full h-auto">
                         </div>
-                        <h2 class="article-title text-xl font-bold mb-2">Cities Reimagine Urban Spaces for Post-Pandemic Era</h2>
-                        <p class="article-summary mb-2">Urban planners focus on green spaces and pedestrian-friendly designs.</p>
+                        <h2 class="article-title text-xl font-bold mb-2">Cities Reimagine Urban Spaces for Post-Pandemic
+                            Era</h2>
+                        <p class="article-summary mb-2">Urban planners focus on green spaces and pedestrian-friendly
+                            designs.</p>
                         <p class="article-byline text-gray-500">By JAMES WILSON</p>
                     </article>
                 </div>
@@ -344,16 +512,20 @@
                         <div class="mb-3">
                             <img src="/api/placeholder/500/300" alt="Virtual Art Gallery" class="w-full h-auto">
                         </div>
-                        <h2 class="article-title text-xl font-bold mb-2">Virtual Reality Transforms Museum Experience</h2>
-                        <p class="article-summary mb-2">Major museums embrace immersive digital experiences to reach global audiences.</p>
+                        <h2 class="article-title text-xl font-bold mb-2">Virtual Reality Transforms Museum Experience
+                        </h2>
+                        <p class="article-summary mb-2">Major museums embrace immersive digital experiences to reach
+                            global audiences.</p>
                         <p class="article-byline text-gray-500">By EMMA RODRIGUEZ</p>
                     </article>
                     <article>
                         <div class="mb-3">
                             <img src="/api/placeholder/500/300" alt="Literary Festival" class="w-full h-auto">
                         </div>
-                        <h2 class="article-title text-xl font-bold mb-2">International Literary Festival Celebrates Emerging Voices</h2>
-                        <p class="article-summary mb-2">Annual event highlights works from previously underrepresented regions.</p>
+                        <h2 class="article-title text-xl font-bold mb-2">International Literary Festival Celebrates
+                            Emerging Voices</h2>
+                        <p class="article-summary mb-2">Annual event highlights works from previously underrepresented
+                            regions.</p>
                         <p class="article-byline text-gray-500">By THOMAS JORDAN</p>
                     </article>
                 </div>
@@ -374,9 +546,8 @@
     <footer class="bg-gray-100 mt-12 py-8">
         <div class="container mx-auto px-4">
             <div class="text-center mb-6">
-                <img src="https://www.vectorlogo.zone/logos/nytimes/nytimes-wordmark.svg" 
-                     alt="The New York Times" 
-                     class="w-48 mx-auto h-8 object-contain">
+                <img src="https://www.vectorlogo.zone/logos/nytimes/nytimes-wordmark.svg" alt="The New York Times"
+                    class="w-48 mx-auto h-8 object-contain">
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                 <div>
@@ -432,7 +603,8 @@
             </div>
             <div class="border-t border-gray-300 pt-6">
                 <div class="text-center text-xs text-gray-500">
-                    <p class="mb-2">© 2025 The New York Times Clone. This is a demonstration for educational purposes only.</p>
+                    <p class="mb-2">© 2025 The New York Times Clone. This is a demonstration for educational purposes
+                        only.</p>
                     <p>NYT Clone • No affiliation with The New York Times Company</p>
                 </div>
             </div>
@@ -440,14 +612,62 @@
     </footer>
 
     <script>
-        // Add some interactivity for demo purposes
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize all variables at the start
+            const searchBtn = document.querySelector('.fa-search').parentElement;
+            const searchContainer = document.getElementById('searchContainer');
+            const searchInput = document.getElementById('searchInput');
+            const voiceSearchBtn = document.getElementById('voiceSearchBtn');
+            const searchStatus = document.getElementById('searchStatus');
+            let recognition = null;
+
+            const dropdownButtons = document.querySelectorAll('.dropdown-button');
+
+
+            dropdownButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const dropdownContent = this.nextElementSibling;
+                    dropdownContent.classList.toggle('show');
+                });
+            });
+
+            // Close the dropdown if the user clicks outside of it
+            window.addEventListener('click', function (event) {
+                if (!event.target.matches('.dropdown-button')) {
+                    const dropdowns = document.querySelectorAll('.dropdown-content');
+                    dropdowns.forEach(dropdown => {
+                        if (dropdown.classList.contains('show')) {
+                            dropdown.classList.remove('show');
+                        }
+                    });
+                }
+            });
+
+            // Add search button click handler
+            searchBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                searchContainer.classList.toggle('hidden');
+                if (!searchContainer.classList.contains('hidden')) {
+                    searchInput.focus();
+                }
+            });
+
+            // Initialize speech recognition
+            // ...existing speech recognition code...
+
+            // Close search when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!searchContainer.contains(e.target) && !searchBtn.contains(e.target)) {
+                    searchContainer.classList.add('hidden');
+                }
+            });
             // Simulate paywall after scrolling
-            window.addEventListener('scroll', function() {
+            window.addEventListener('scroll', function () {
                 let scrollPosition = window.scrollY;
                 let pageHeight = document.documentElement.scrollHeight;
                 let viewportHeight = window.innerHeight;
-                
+
                 // Show paywall after scrolling 70% of the page
                 if (scrollPosition > (pageHeight - viewportHeight) * 0.7) {
                     document.querySelector('.fade-overlay').style.display = 'block';
@@ -455,18 +675,156 @@
                 }
             });
 
-            // Toggle mobile menu (simple implementation)
-            const menuButton = document.querySelector('.fa-bars').parentElement;
-            menuButton.addEventListener('click', function() {
-                alert('Menu functionality would appear here in a full implementation');
+            // Initialize speech recognition
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = function () {
+                    searchStatus.classList.remove('hidden');
+                    searchStatus.textContent = 'Listening...';
+                    voiceSearchBtn.classList.add('listening');
+                };
+
+                recognition.onend = function () {
+                    searchStatus.classList.add('hidden');
+                    voiceSearchBtn.classList.remove('listening');
+                };
+
+                recognition.onresult = function (event) {
+                    const transcript = event.results[0][0].transcript;
+                    searchInput.value = transcript;
+                    // Automatically trigger search after voice input
+                    handleSearch(transcript);
+                };
+                // Replace the existing recognition.onerror handler
+                // Replace the existing recognition.onerror handler
+                recognition.onerror = function (event) {
+                    console.error('Speech recognition error:', event.error);
+                    voiceSearchBtn.classList.remove('listening');
+
+                    let errorMessage = '';
+                    let shouldRetry = false;
+
+                    switch (event.error) {
+                        case 'network':
+                            errorMessage = 'Network connection lost. Retrying...';
+                            shouldRetry = true;
+                            break;
+                        case 'not-allowed':
+                            errorMessage = 'Microphone access denied. Please allow microphone access.';
+                            break;
+                        case 'no-speech':
+                            errorMessage = 'No speech detected. Please try again.';
+                            break;
+                        case 'aborted':
+                            errorMessage = 'Speech recognition was aborted.';
+                            break;
+                        default:
+                            errorMessage = 'An error occurred. Please try again.';
+                    }
+
+                    // Show error message
+                    searchStatus.classList.remove('hidden');
+                    searchStatus.textContent = errorMessage;
+                    searchStatus.style.color = '#ef4444';
+
+                    // Implement retry logic for network errors
+                    if (shouldRetry) {
+                        let retryCount = 0;
+                        const maxRetries = 3;
+                        const retryInterval = 2000; // 2 seconds
+
+                        const attemptReconnection = function () {
+                            if (retryCount < maxRetries) {
+                                retryCount++;
+                                searchStatus.textContent = `Retrying... Attempt ${retryCount} of ${maxRetries}`;
+
+                                setTimeout(() => {
+                                    try {
+                                        recognition.start();
+                                    } catch (e) {
+                                        console.error('Retry failed:', e);
+                                        if (retryCount === maxRetries) {
+                                            searchStatus.textContent = 'Connection failed. Please try again later.';
+                                            setTimeout(() => {
+                                                searchStatus.classList.add('hidden');
+                                                searchStatus.style.color = '';
+                                            }, 3000);
+                                        } else {
+                                            attemptReconnection();
+                                        }
+                                    }
+                                }, retryInterval);
+                            }
+                        };
+
+                        attemptReconnection();
+                    } else {
+                        // Hide non-network error messages after 3 seconds
+                        setTimeout(() => {
+                            searchStatus.classList.add('hidden');
+                            searchStatus.style.color = '';
+                        }, 3000);
+                    }
+                };
+
+                // Handle voice search
+                voiceSearchBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (recognition) {
+                        try {
+                            if (voiceSearchBtn.classList.contains('listening')) {
+                                recognition.stop();
+                            } else {
+                                recognition.start();
+                            }
+                        } catch (error) {
+                            console.error('Speech recognition error:', error);
+                            searchStatus.classList.remove('hidden');
+                            searchStatus.textContent = 'Speech recognition failed. Please try again.';
+                            searchStatus.style.color = '#ef4444';
+                            setTimeout(() => {
+                                searchStatus.classList.add('hidden');
+                                searchStatus.style.color = '';
+                            }, 3000);
+                        }
+                    } else {
+                        alert('Speech recognition is not supported in your browser. Please try Chrome or Edge.');
+                    }
+                });
+            }
+
+            // Close search when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!searchContainer.contains(e.target) && !searchBtn.contains(e.target)) {
+                    searchContainer.classList.add('hidden');
+                }
             });
 
-            // Toggle search
-            const searchButton = document.querySelector('.fa-search').parentElement;
-            searchButton.addEventListener('click', function() {
-                alert('Search functionality would appear here in a full implementation');
+            // Handle search submission
+            searchInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    handleSearch(searchInput.value);
+                }
+            });
+
+            function handleSearch(query) {
+                // Implement your search logic here
+                alert(`Searching for: ${query}`);
+                searchContainer.classList.add('hidden');
+                searchInput.value = '';
+            }
+
+            // Toggle mobile menu
+            const menuButton = document.querySelector('.fa-bars').parentElement;
+            menuButton.addEventListener('click', function () {
+                alert('Menu functionality would appear here in a full implementation');
             });
         });
     </script>
 </body>
+
 </html>
